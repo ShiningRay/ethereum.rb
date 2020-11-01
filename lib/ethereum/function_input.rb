@@ -8,6 +8,9 @@ module Ethereum
       @name = data["name"]
     end
 
+    def inspect
+      "#{name} : #{type}"
+    end
   end
 
 end
