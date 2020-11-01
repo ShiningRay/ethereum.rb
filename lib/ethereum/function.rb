@@ -31,6 +31,12 @@ module Ethereum
     def self.calc_id(signature)
       Digest::SHA3.hexdigest(signature, 256)[0..7]
     end
+    def inspect
+      "#{@name}(#{@inputs.map(&:inspect).join(', ')}) => #{@outputs}  @#{@signature}"
+    end
 
+    def to_s
+      inspect
+    end
   end
 end
