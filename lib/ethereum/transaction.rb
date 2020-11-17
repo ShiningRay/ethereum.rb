@@ -1,7 +1,5 @@
 module Ethereum
-
   class Transaction
-
     DEFAULT_TIMEOUT = 300.seconds
     DEFAULT_STEP = 5.seconds
 
@@ -21,15 +19,17 @@ module Ethereum
 
     def mined?
       return true if @mined
+
       tx = @connection.eth_get_transaction_by_hash(@id)
-      @mined = !tx.nil? && !tx["result"].nil? && tx["result"]["blockNumber"].present?
+      @mined = !tx.nil? && !tx['result'].nil? && tx['result']['blockNumber'].present?
     end
 
     def wait_for_miner(timeout: DEFAULT_TIMEOUT, step: DEFAULT_STEP)
       start_time = Time.now
       loop do
-        raise Timeout::Error if ((Time.now - start_time) > timeout)
-        return true if self.mined?
+        raise Timeout::Error if (Time.now - start_time) > timeout
+        return self if mined?
+
         sleep step
       end
     end

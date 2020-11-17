@@ -116,16 +116,16 @@ module Ethereum
       @client.eth_send_transaction(tx_args)['result']
     end
 
-    def send_raw_transaction(payload, to = nil)
+    def send_raw_transaction(payload, to = nil, options = {})
       Eth.configure { |c| c.chain_id = @client.net_version['result'].to_i }
       @nonce = @client.get_nonce(key.address)
       args = {
         from: key.address,
-        value: 0,
+        value: options[:value] || 0,
         data: payload,
-        nonce: @nonce,
-        gas_limit: gas_limit,
-        gas_price: gas_price
+        nonce: options[:nonce] || @nonce,
+        gas_limit: options[:gas_limit] || options[:gas] || gas_limit,
+        gas_price: options[:gas_price] || gas_price
       }
       args[:to] = to if to
       tx = Eth::Tx.new(args)
@@ -184,8 +184,10 @@ module Ethereum
     end
 
     def transact(fun, *args)
+      options = args[-1].is_a?(Hash) ? args.pop : {}
+      options[:value] = @formatter.to_wei(options.delete(:eth)) if options[:eth]
       tx = if key
-             send_raw_transaction(call_payload(fun, args), address)
+             send_raw_transaction(call_payload(fun, args), address, options)
            else
              send_transaction(call_args(fun, args))
            end
