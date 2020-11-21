@@ -118,12 +118,11 @@ module Ethereum
 
     def send_raw_transaction(payload, to = nil, options = {})
       Eth.configure { |c| c.chain_id = @client.net_version['result'].to_i }
-      @nonce = @client.get_nonce(key.address)
       args = {
         from: key.address,
         value: options[:value] || 0,
         data: payload,
-        nonce: options[:nonce] || @nonce,
+        nonce: options[:nonce] || @client.get_nonce(key.address),
         gas_limit: options[:gas_limit] || options[:gas] || gas_limit,
         gas_price: options[:gas_price] || gas_price
       }
