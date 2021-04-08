@@ -17,7 +17,11 @@ module Ethereum
       @constructor_inputs, @functions, @events = Ethereum::Abi.parse_abi(abi)
       @formatter = Ethereum::Formatter.new
       @client = client
-      @sender = client.default_account
+      @sender = begin
+                  client.default_account
+                rescue StandardError
+                  nil
+                end
       @encoder = Encoder.new
       @decoder = Decoder.new
       @gas_limit = @client.gas_limit
